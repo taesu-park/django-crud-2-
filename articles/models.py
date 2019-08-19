@@ -6,11 +6,10 @@ from django.db import models
 # 각각의 컬럼(필드) 정의
 class Article(models.Model):
     # id : integer 자동으로 정의(Primary Key)
-
     # CharField - 필수인자로 max_length 지정
     title = models.CharField(max_length=10)
     content = models.TextField()
-    # DateTimeField 
+    # DateTimeField
     #    auto_now_add : 생성시 자동으로 저장
     #    auto_now : 수정시마다 자동으로 저장
     created_at = models.DateTimeField(auto_now_add=True)
