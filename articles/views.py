@@ -1,10 +1,11 @@
 # from IPython import embed
 from django.shortcuts import render, redirect
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 
 from .models import Article, Comment
 
 # Create your views here.
+@require_GET
 def index(request):
     articles = Article.objects.order_by('-id')
     context = {
@@ -74,4 +75,10 @@ def comment_create(request, article_pk):
     comment.article = article
     # comment.article_id = article_pk
     comment.save()
-    return redirect('articles:detail', article.pk)
+    return redirect('articles:detail', article_pk)
+
+@require_POST
+def comment_delete(request, article_pk, comment_pk):
+    comment = Comment.objects.get(pk=comment_pk)
+    comment.delete()
+    return redirect('articles:detail', article_pk)
