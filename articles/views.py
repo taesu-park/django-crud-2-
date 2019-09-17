@@ -1,4 +1,5 @@
 # from IPython import embed
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST, require_GET
 
@@ -30,11 +31,9 @@ def create(request):
 def detail(request, article_pk):
     article = Article.objects.get(pk=article_pk)
     comments = article.comment_set.all()
-    a = ['송편', '대추', '밤']
     context = {
         'article': article,
         'comments': comments,
-        'a': a
     }
     return render(request, 'articles/detail.html', context)
 
@@ -81,4 +80,6 @@ def comment_create(request, article_pk):
 def comment_delete(request, article_pk, comment_pk):
     comment = Comment.objects.get(pk=comment_pk)
     comment.delete()
+    # messages.add_message(request, messages.INFO, '댓글이 삭제 되었습니다.')
+    messages.success(request, '댓글이 삭제되었습니다.')
     return redirect('articles:detail', article_pk)
