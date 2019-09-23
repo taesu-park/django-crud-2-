@@ -20,8 +20,9 @@ def index(request):
 
 def create(request):
     if request.method == 'POST':
+        # embed()
     # POST 요청 -> 검증 및 저장
-        article_form = ArticleForm(request.POST)
+        article_form = ArticleForm(request.POST, request.FILES)
         # embed()
         if article_form.is_valid():
         # 검증에 성공하면 저장하고,
