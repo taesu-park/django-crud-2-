@@ -30,9 +30,23 @@
         <li class="nav-item">
           <a class="nav-link" href="/articles/new/">글 작성하기</a>
         </li>
+        {% if user.is_authenticated %}
+        <!-- 로그인이 되어 있다면, -->
         <li class="nav-item">
           <a class="nav-link">{{ user.username }}</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:logout'%}">로그아웃</a>
+        </li>
+        {% else %}
+        <!-- 로그인이 되어 있지 않다면, -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:signup'%}">회원가입</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:login'%}">로그인</a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </nav>
