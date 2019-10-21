@@ -3,7 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
-
+# from accounts.models import User
+from django.contrib.auth import get_user_model
 from .forms import ArticleForm, CommentForm
 from .models import Article, Comment
 
@@ -31,7 +32,9 @@ def create(request):
             # title = article_form.cleaned_data.get('title')
             # content = article_form.cleaned_data.get('content')
             # article = Article(title=title, content=content)
-            article = article_form.save()
+            article = article_form.save(commit=False)
+            article.user = request.user # user 인스턴스!
+            article.save()
             # redirect
             return redirect('articles:detail', article.pk)
     else:
