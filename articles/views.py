@@ -61,6 +61,7 @@ def detail(request, article_pk):
     return render(request, 'articles/detail.html', context)
 
 @require_POST
+@login_required
 def delete(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
     if article.user == request.user:
