@@ -9,7 +9,7 @@ class ArticleForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        exclude = ('article', )
+        exclude = ('article', 'user', )
 
 # class ArticleForm(forms.ModelForm):
 #     # 위젯 설정 2.
