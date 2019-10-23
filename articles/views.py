@@ -95,7 +95,7 @@ def update(request, article_pk):
 
 @require_POST
 def comment_create(request, article_pk):
-    if request.user.is_autenticated:
+    if request.user.is_authenticated:
         article = get_object_or_404(Article, pk=article_pk)
         # 1. modelform에 사용자 입력값 넣고
         comment_form = CommentForm(request.POST)
@@ -131,6 +131,7 @@ def comment_delete(request, article_pk, comment_pk):
     else:
         return HttpResponseForbidden()
 
+@login_required
 def like(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
     # 좋아요를 누른적이 있다면?
