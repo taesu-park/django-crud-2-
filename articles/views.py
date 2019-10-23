@@ -1,7 +1,7 @@
 from IPython import embed
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import get_user_model
@@ -94,25 +94,26 @@ def update(request, article_pk):
         return HttpResponseForbidden()
 
 @require_POST
-@login_required
 def comment_create(request, article_pk):
-    article = get_object_or_404(Article, pk=article_pk)
-    # 1. modelform에 사용자 입력값 넣고
-    comment_form = CommentForm(request.POST)
-    # 2. 검증하고,
-    if comment_form.is_valid():
-    # 3. 맞으면 저장!
-        # 3-1. 사용자 입력값으로 comment instance 생성 (저장은 X)
-        comment = comment_form.save(commit=False)
-        # 3-2. FK 넣고 저장
-        comment.article = article
-        comment.user = request.user
-        comment.save()
-    # 4. return redirect
+    if request.user.is_autenticated:
+        article = get_object_or_404(Article, pk=article_pk)
+        # 1. modelform에 사용자 입력값 넣고
+        comment_form = CommentForm(request.POST)
+        # 2. 검증하고,
+        if comment_form.is_valid():
+        # 3. 맞으면 저장!
+            # 3-1. 사용자 입력값으로 comment instance 생성 (저장은 X)
+            comment = comment_form.save(commit=False)
+            # 3-2. FK 넣고 저장
+            comment.article = article
+            comment.user = request.user
+            comment.save()
+        # 4. return redirect
+        else:
+            messages.success(request, '댓글이 형식이 맞지 않습니다.')
+        return redirect('articles:detail', article_pk)
     else:
-        messages.success(request, '댓글이 형식이 맞지 않습니다.')
-    return redirect('articles:detail', article_pk)
-
+        return HttpResponse('Unauthorized', status=401)
     # comment = Comment()
     # comment.content = request.POST.get('content')
     # comment.article = article
@@ -129,3 +130,16 @@ def comment_delete(request, article_pk, comment_pk):
         return redirect('articles:detail', article_pk)
     else:
         return HttpResponseForbidden()
+
+def like(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+    # 좋아요를 누른적이 있다면?
+    # if article.like_users.filter(id=request.user.id):
+    if request.user in article.like_users.all():
+        # 좋아요 취소 로직
+        article.like_users.remove(request.user)
+    # 아니면
+    else:
+        # 좋아요 로직
+        article.like_users.add(request.user)
+    return redirect('articles:detail', article_pk)
