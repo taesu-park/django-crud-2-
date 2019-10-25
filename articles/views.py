@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import get_user_model
 
 from .forms import ArticleForm, CommentForm
-from .models import Article, Comment
+from .models import Article, Comment, HashTag
 
 # Create your views here.
 @require_GET
@@ -36,6 +36,12 @@ def create(request):
             article = article_form.save(commit=False)
             article.user = request.user # user 인스턴스!
             article.save()
+            # 해시태그 저장 및 연결 작업
+            for word in article.content.split():
+                if word[0] == '#':
+                    hashtag, created = HashTag.objects.get_or_create(content=word)
+                    article.hashtags.add(hashtag)
+                    # Hash
             # redirect
             return redirect('articles:detail', article.pk)
     else:
@@ -83,6 +89,12 @@ def update(request, article_pk):
             article_form = ArticleForm(request.POST, instance=article)
             if article_form.is_valid():
                 article = article_form.save()
+                # 해시태그 수정
+                article.hashtags.clear()
+                for word in article.content.split():
+                    if word[0] == '#':
+                        hashtag, created = HashTag.objects.get_or_create(content=word)
+                        article.hashtags.add(hashtag)
                 return redirect('articles:detail', article.pk)
         else:
             article_form = ArticleForm(instance=article)
@@ -144,3 +156,10 @@ def like(request, article_pk):
         # 좋아요 로직
         article.like_users.add(request.user)
     return redirect('articles:detail', article_pk)
+
+def hashtag(request, tag):
+    hashtag = get_object_or_404(HashTag, pk=tag)
+    context = {
+        'hashtag' : hashtag
+    }
+    return render(request, 'articles/hashtag.html', context)
